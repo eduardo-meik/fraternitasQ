@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function hasAdminRoleInUsers() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles != null &&
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    }
+
+    function hasAdminRoleInUsersDev() {
+      return exists(/databases/$(database)/documents/users_dev/$(request.auth.uid)) &&
+      get(/databases/$(database)/documents/users_dev/$(request.auth.uid)).data.roles != null &&
+      get(/databases/$(database)/documents/users_dev/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (hasAdminRoleInUsers() || hasAdminRoleInUsersDev());
+    }
+
+    function validCurrentStep(step) {
+      return step is int && step >= 1 && step <= 5;
+    }
+
+    function validQuestionnaireResponseCreate() {
+      return request.resource.data.keys().hasOnly([
+          'questionnaireId',
+          'respondentUid',
+          'currentStep',
+          'invitationCodeUsed',
+          'referredByCode',
+          'narrativeAnswers',
+          'psychographicSegment',
+          'demographicMetadata',
+          'reportEmail',
+          'ambassadorCodeGenerated',
+          'createdAt',
+          'updatedAt',
+          'completedAt',
+          'schemaVersion'
+      ]) &&
+      request.resource.data.respondentUid is string &&
+      isOwner(request.resource.data.respondentUid) &&
+      request.resource.data.questionnaireId is string &&
+      validCurrentStep(request.resource.data.currentStep);
+    }
+
+    function validQuestionnaireResponseUpdate() {
+      return request.resource.data.respondentUid == resource.data.respondentUid &&
+      isOwner(resource.data.respondentUid) &&
+      request.resource.data.questionnaireId == resource.data.questionnaireId &&
+      validCurrentStep(request.resource.data.currentStep) &&
+      request.resource.data.keys().hasOnly([
+          'questionnaireId',
+          'respondentUid',
+          'currentStep',
+          'invitationCodeUsed',
+          'referredByCode',
+          'narrativeAnswers',
+          'psychographicSegment',
+          'demographicMetadata',
+          'reportEmail',
+          'ambassadorCodeGenerated',
+          'createdAt',
+          'updatedAt',
+          'completedAt',
+          'schemaVersion'
+      ]);
+    }
+
+    match /questionnaireResponses/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.respondentUid);
+      allow list: if isAdmin() || isOwner(resource.data.respondentUid);
+      allow create: if validQuestionnaireResponseCreate();
+      allow update: if isAdmin() || validQuestionnaireResponseUpdate();
+      allow delete: if false;
+    }
+
+    match /questionnaireResponses_dev/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.respondentUid);
+      allow list: if isAdmin() || isOwner(resource.data.respondentUid);
+      allow create: if validQuestionnaireResponseCreate();
+      allow update: if isAdmin() || validQuestionnaireResponseUpdate();
+      allow delete: if false;
+    }
+
+    // Sensitive operations for ambassador and referral data are backend-only.
+    match /ambassadorProfiles/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.ownerUid);
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /ambassadorProfiles_dev/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.ownerUid);
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /referralAttributions/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.referredUid);
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /referralAttributions_dev/{docId} {
+      allow get: if isAdmin() || isOwner(resource.data.referredUid);
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Report references: read-only for authenticated owners. Writes are server-only.
+    match /reportRef/{docId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if false;
+    }
+
+    match /reportRef_dev/{docId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if false;
+    }
+
+    // User documents: read/write only by the owner
+    match /users/{userId} {
+      allow get: if isAdmin() || isOwner(userId);
+      allow list: if isAdmin();
+      allow create, update: if isAdmin() || isOwner(userId);
+      allow delete: if false;
+    }
+
+    match /users_dev/{userId} {
+      allow get: if isAdmin() || isOwner(userId);
+      allow list: if isAdmin();
+      allow create, update: if isAdmin() || isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Elicitation events (studies): write is server-only, public read for launched events
+    match /studies/{docId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+
+    match /studies_dev/{docId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+  }
+}
