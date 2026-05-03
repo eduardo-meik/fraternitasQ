@@ -117,8 +117,8 @@ function QuestionnaireContent() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Bienvenido al Cuestionario</h2>
-              <p className="text-muted-foreground">Tu participación es fundamental para nuestra investigación.</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Bienvenido al Cuestionario</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Tu participación es fundamental para nuestra investigación.</p>
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -138,8 +138,8 @@ function QuestionnaireContent() {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Tus Relatos</h2>
-              <p className="text-muted-foreground">Por favor, comparte tus experiencias con nosotros. Mínimo 200 caracteres por respuesta.</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Tus Relatos</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Por favor, comparte tus experiencias con nosotros. Mínimo 200 caracteres por respuesta.</p>
             </div>
             
             <div className="space-y-6">
@@ -192,8 +192,8 @@ function QuestionnaireContent() {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Afiliación</h2>
-              <p className="text-muted-foreground">¿A qué tipo de organización te sientes más vinculado?</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Afiliación</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">¿A qué tipo de organización te sientes más vinculado?</p>
             </div>
 
             <div className="space-y-6">
@@ -233,8 +233,8 @@ function QuestionnaireContent() {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Datos Demográficos</h2>
-              <p className="text-muted-foreground">Para finalizar, cuéntanos un poco más sobre ti.</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Datos Demográficos</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Para finalizar, cuéntanos un poco más sobre ti.</p>
             </div>
 
             <div className="space-y-6">
@@ -291,16 +291,16 @@ function QuestionnaireContent() {
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold">¡Muchas Gracias!</h2>
-              <p className="text-muted-foreground">Tu respuesta ha sido registrada exitosamente.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold">¡Muchas Gracias!</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Tu respuesta ha sido registrada exitosamente.</p>
             </div>
 
             <Card className="bg-muted/50 border-dashed">
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <p className="text-sm font-medium">Comparte este código con otros miembros:</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <code className="text-2xl font-mono bg-background px-4 py-2 rounded border font-bold">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <code className="text-lg sm:text-2xl font-mono bg-background px-3 sm:px-4 py-2 rounded border font-bold break-all">
                       {formData.generatedCode}
                     </code>
                     <Button 
@@ -330,10 +330,10 @@ function QuestionnaireContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-start sm:justify-center p-3 sm:p-4 py-6">
       <div className="w-full max-w-xl">
         {step < 5 && (
-          <div className="mb-8 space-y-2">
+          <div className="mb-6 sm:mb-8 space-y-2">
             <div className="flex justify-between text-xs font-medium text-muted-foreground">
               <span>Paso {step} de 4</span>
               <span>{Math.round((step / 4) * 100)}% Completado</span>
@@ -362,36 +362,41 @@ function QuestionnaireContent() {
             {renderStep()}
           </CardContent>
           {step < 5 && (
-            <CardFooter className="flex justify-between border-t pt-6">
+            <CardFooter className="flex justify-between gap-2 border-t pt-6">
               <Button
                 variant="ghost"
                 onClick={() => setStep(prev => Math.max(1, prev - 1))}
                 disabled={step === 1 || loading}
+                className="px-2 sm:px-4"
               >
-                <ChevronLeft className="mr-2 w-4 h-4" /> Atrás
+                <ChevronLeft className="sm:mr-2 w-4 h-4" />
+                <span className="hidden sm:inline">Atrás</span>
               </Button>
-              
+
               {step === 4 ? (
-                <Button 
-                  onClick={handleFinalize} 
+                <Button
+                  onClick={handleFinalize}
                   disabled={!isStepValid() || loading}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Enviando...
                     </>
                   ) : (
                     <>
-                      Finalizar y Enviar <CheckCircle2 className="ml-2 w-4 h-4" />
+                      <span className="sm:hidden">Finalizar</span>
+                      <span className="hidden sm:inline">Finalizar y Enviar</span>
+                      <CheckCircle2 className="ml-2 w-4 h-4" />
                     </>
                   )}
                 </Button>
               ) : (
-                <Button 
-                  onClick={() => setStep(prev => prev + 1)} 
+                <Button
+                  onClick={() => setStep(prev => prev + 1)}
                   disabled={!isStepValid() || loading}
+                  className="flex-1 sm:flex-none"
                 >
                   Siguiente <ChevronRight className="ml-2 w-4 h-4" />
                 </Button>
