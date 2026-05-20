@@ -190,7 +190,7 @@ function QuestionnaireContent() {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <p className="text-xs uppercase tracking-wide text-primary font-semibold">Relato 3 de 3</p>
-              <h2 className="text-xl sm:text-2xl font-bold">En un mundo de vínculos virtuales y relaciones entre personas y computadoras, ¿es posible la fraternidad sin presencia física? ¿Cómo se vería?</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">En un mundo de vínculos virtuales y relaciones entre personas y computadoras, ¿Es posible la fraternidad sin presencia física? ¿Cómo se vería?</h2>
               <p className="text-sm sm:text-base text-muted-foreground">Mínimo 200 caracteres.</p>
             </div>
             <div className="space-y-2">
