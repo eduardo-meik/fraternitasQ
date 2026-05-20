@@ -340,10 +340,10 @@ function QuestionnaireContent() {
                     const shareUrl = typeof window !== 'undefined'
                       ? `${window.location.origin}/questionnaire/202605_fraternitas/?ref=${formData.generatedCode}`
                       : '';
-                    const shareText = `Te invito a participar en la investigación FraternitasQ sobre la fraternidad en Chile. Usa mi código ${formData.generatedCode} o este enlace: ${shareUrl}`;
+                    const shareText = `Te invito a participar en la investigación FraternitasQ que organiza la Corporación Aurora de Italia sobre la fraternidad en Chile. Usa mi código ${formData.generatedCode} o este enlace: ${shareUrl}`;
                     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                     const emailSubject = 'Invitación a la investigación FraternitasQ';
-                    const emailBody = `Hola,\n\nTe invito a participar en la investigación FraternitasQ sobre la fraternidad en el Chile contemporáneo.\n\nUsa mi código de invitación: ${formData.generatedCode}\nO accede directamente aquí: ${shareUrl}\n\n¡Gracias!`;
+                    const emailBody = `Hola,\n\nTe invito a participar en la investigación FraternitasQ que organiza la Corporación Aurora de Italia sobre la fraternidad en el Chile contemporáneo.\n\nUsa mi código de invitación: ${formData.generatedCode}\nO accede directamente aquí: ${shareUrl}\n\n¡Gracias!`;
                     const mailtoUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
                     return (
