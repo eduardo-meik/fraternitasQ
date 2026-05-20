@@ -43,3 +43,8 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# secrets & data exports
+/service-account*.json
+/network.json
+/network-*.json

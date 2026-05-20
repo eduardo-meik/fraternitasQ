@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "fraternitas-3ec19"
-  }
+    "default": "fraternitasv2"
+  },
+  "targets": {},
+  "etags": {}
 }

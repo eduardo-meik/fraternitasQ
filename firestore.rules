@@ -156,5 +156,44 @@ service cloud.firestore {
       allow list: if true;
       allow create, update, delete: if false;
     }
+
+    // Public questionnaire submissions (FraternitasQ landing form).
+    // Anyone can submit a response; reads/edits are admin-only.
+    match /respuestas_fraternidad/{docId} {
+      allow get, list: if isAdmin();
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          'experience_lived',
+          'limits_and_tensions',
+          'future_and_technology',
+          'community_affiliation',
+          'lodge_name',
+          'age_range',
+          'location',
+          'gender',
+          'referrer_code',
+          'ambassador_code',
+          'submission_timestamp'
+        ]) &&
+        request.resource.data.ambassador_code is string &&
+        request.resource.data.ambassador_code.matches('^FRAT-[A-Z0-9]{8}$') &&
+        request.resource.data.experience_lived is string &&
+        request.resource.data.experience_lived.size() >= 200 &&
+        request.resource.data.experience_lived.size() <= 10000 &&
+        request.resource.data.limits_and_tensions is string &&
+        request.resource.data.limits_and_tensions.size() >= 200 &&
+        request.resource.data.limits_and_tensions.size() <= 10000 &&
+        request.resource.data.future_and_technology is string &&
+        request.resource.data.future_and_technology.size() >= 200 &&
+        request.resource.data.future_and_technology.size() <= 10000 &&
+        request.resource.data.community_affiliation is string &&
+        (request.resource.data.lodge_name == null || request.resource.data.lodge_name is string) &&
+        request.resource.data.age_range is string &&
+        request.resource.data.gender is string &&
+        request.resource.data.location is string &&
+        request.resource.data.referrer_code is string &&
+        request.resource.data.submission_timestamp == request.time;
+      allow update, delete: if false;
+    }
   }
 }
