@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'FraternitasQ — Investigación sobre la Fraternidad en Chile',
-  description: 'Estudio de sociología computacional sobre las dimensiones latentes de la Fraternidad en el Chile contemporáneo. Aurora de Italia · Metodología Talk to the City.',
+  description: 'Estudio de sociología computacional sobre las dimensiones latentes de la Fraternidad en el Chile contemporáneo. Corporación Aurora de Italia · Metodología Talk to the City.',
 };
 
 export default function RootLayout({

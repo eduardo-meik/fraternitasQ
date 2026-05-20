@@ -102,7 +102,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <Badge variant="secondary" className="mx-auto">
-            Investigación Aurora de Italia · Metodología Talk to the City
+            Investigación Corporación Aurora de Italia · Metodología Talk to the City
           </Badge>
           <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
             Dimensiones Latentes de la{" "}
@@ -138,7 +138,7 @@ export default function Home() {
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               A pesar de constituir uno de los pilares axiológicos de la
-              modernidad republicana, el concepto de Fraternidad ha sido
+              modernidad republicana de nuestro país, el concepto de Fraternidad ha sido
               históricamente supeditado a las categorías de Libertad e Igualdad.
             </p>
             <p className="text-muted-foreground leading-relaxed">
@@ -390,7 +390,7 @@ export default function Home() {
 
       <footer className="border-t bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-xs text-muted-foreground text-center">
-          Investigación Aurora de Italia · FraternitasQ ·{" "}
+          Investigación Corporación Aurora de Italia · FraternitasQ ·{" "}
           {new Date().getFullYear()}
         </div>
       </footer>
