@@ -39,6 +39,15 @@ const INITIAL_FORM_DATA: FormData = {
   generatedCode: '',
 };
 
+function generateAmbassadorCode() {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let suffix = '';
+  for (let i = 0; i < 8; i++) {
+    suffix += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return `FRAT-${suffix}`;
+}
+
 function QuestionnaireContent() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
@@ -88,6 +97,8 @@ function QuestionnaireContent() {
   const handleFinalize = async () => {
     setLoading(true);
     try {
+      const ambassadorCode = generateAmbassadorCode();
+
       await addDoc(collection(db, "respuestas_fraternidad"), {
         experience_lived: formData.answer1 || "",
         limits_and_tensions: formData.answer2 || "",
@@ -100,11 +111,11 @@ function QuestionnaireContent() {
         location: formData.location || "",
         gender: formData.gender || "",
         referrer_code: formData.invitationCode || "Orgánico",
+        ambassador_code: ambassadorCode,
         submission_timestamp: serverTimestamp()
       });
 
-      const generatedSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
-      setFormData(prev => ({ ...prev, generatedCode: `FRAT-${generatedSuffix}` }));
+      setFormData(prev => ({ ...prev, generatedCode: ambassadorCode }));
       setStep(SUCCESS_STEP);
     } catch (error) {
       console.error("Error guardando en Firestore:", error);

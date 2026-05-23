@@ -175,8 +175,6 @@ service cloud.firestore {
           'ambassador_code',
           'submission_timestamp'
         ]) &&
-        request.resource.data.ambassador_code is string &&
-        request.resource.data.ambassador_code.matches('^FRAT-[A-Z0-9]{8}$') &&
         request.resource.data.experience_lived is string &&
         request.resource.data.experience_lived.size() >= 200 &&
         request.resource.data.experience_lived.size() <= 10000 &&
@@ -192,6 +190,13 @@ service cloud.firestore {
         request.resource.data.gender is string &&
         request.resource.data.location is string &&
         request.resource.data.referrer_code is string &&
+        (
+          !request.resource.data.keys().hasAny(['ambassador_code']) ||
+          (
+            request.resource.data.ambassador_code is string &&
+            request.resource.data.ambassador_code.matches('^FRAT-[A-Z0-9]{8}$')
+          )
+        ) &&
         request.resource.data.submission_timestamp == request.time;
       allow update, delete: if false;
     }
