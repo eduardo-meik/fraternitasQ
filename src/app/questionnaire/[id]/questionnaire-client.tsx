@@ -48,10 +48,62 @@ function generateAmbassadorCode() {
   return `FRAT-${suffix}`;
 }
 
+function reportClientIssue(context: string, error: unknown, details?: Record<string, unknown>) {
+  const payload = {
+    context,
+    message: error instanceof Error ? error.message : String(error),
+    stack: error instanceof Error ? error.stack : undefined,
+    details: details ?? {},
+    url: typeof window !== 'undefined' ? window.location.href : 'server',
+    timestamp: new Date().toISOString(),
+  };
+
+  console.error('[FraternitasQ] Questionnaire issue', payload);
+
+  if (typeof window !== 'undefined') {
+    try {
+      const key = 'fraternitas_submit_errors';
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? (JSON.parse(raw) as unknown[]) : [];
+      const next = [...parsed.slice(-19), payload];
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {
+      // Ignore persistence failures.
+    }
+  }
+}
+
+async function copyToClipboardSafe(text: string) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  if (typeof document === 'undefined') {
+    throw new Error('Clipboard API is unavailable in this environment.');
+  }
+
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-9999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  const successful = document.execCommand('copy');
+  document.body.removeChild(textArea);
+
+  if (!successful) {
+    throw new Error('Could not copy text using fallback method.');
+  }
+}
+
 function QuestionnaireContent() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
 
   useEffect(() => {
@@ -96,6 +148,7 @@ function QuestionnaireContent() {
 
   const handleFinalize = async () => {
     setLoading(true);
+    setSubmitError('');
     try {
       const ambassadorCode = generateAmbassadorCode();
 
@@ -118,8 +171,14 @@ function QuestionnaireContent() {
       setFormData(prev => ({ ...prev, generatedCode: ambassadorCode }));
       setStep(SUCCESS_STEP);
     } catch (error) {
-      console.error("Error guardando en Firestore:", error);
-      alert("Hubo un error de conexión.");
+      reportClientIssue('finalize-submit', error, {
+        communityAffiliation: formData.communityAffiliation,
+        answer1Length: formData.answer1.length,
+        answer2Length: formData.answer2.length,
+        answer3Length: formData.answer3.length,
+      });
+
+      setSubmitError('No pudimos enviar tu respuesta. Revisa tu conexión e inténtalo nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -338,9 +397,16 @@ function QuestionnaireContent() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => {
-                        navigator.clipboard.writeText(formData.generatedCode);
-                        alert("Código copiado al portapapeles");
+                      onClick={async () => {
+                        try {
+                          await copyToClipboardSafe(formData.generatedCode);
+                          alert("Código copiado al portapapeles");
+                        } catch (error) {
+                          reportClientIssue('copy-ambassador-code', error, {
+                            generatedCode: formData.generatedCode,
+                          });
+                          alert('No pudimos copiar el código automáticamente. Puedes copiarlo manualmente.');
+                        }
                       }}
                     >
                       <Clipboard className="w-4 h-4" />
@@ -467,6 +533,14 @@ function QuestionnaireContent() {
                 </Button>
               )}
             </CardFooter>
+          )}
+
+          {submitError && (
+            <div className="px-6 pb-6">
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {submitError}
+              </div>
+            </div>
           )}
         </Card>
       </div>
